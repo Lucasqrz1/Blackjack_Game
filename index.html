@@ -4,72 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blackjack Game</title>
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.18.1/full/pyodide.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.26.3/full/pyodide.js"></script>
 </head>
 <body>
     <h1>Welcome to the Blackjack Game!</h1>
-    <div id="game"></div>
-    <script type="text/python">
-        import random
+    <div id="output"></div>
+    <script type="text/javascript">
+        async function main() {
+            let pyodide = await loadPyodide();
+            await pyodide.runPythonAsync(`
+                import random
 
-        logo = """
-        .------.            _     _            _    _            _    
-        |A_  _ |.          | |   | |          | |  (_)          | |   
-        |( \/ ).-----.     | |__ | | __ _  ___| | ___  __ _  ___| | __
-        | \  /|K /\  |     | '_ \| |/ _` |/ __| |/ / |/ _` |/ __| |/ /
-        |  \/ | /  \ |     | |_) | | (_| | (__|   <| | (_| | (__|   < 
-        `-----| \  / |     |_.__/|_|\__,_|\___|_|\_\ |\__,_|\___|_|\_\\
-              |  \/ K|                            _/ |                
-              `------'                           |__/           
-        """
-        
-        print(logo)
-        
-        cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
-        player_cards = random.sample(cards, 2)
-        comp_first_card = random.choice(cards)
-        comp_cards = random.sample(cards, 2)
-        play = input("Do you want to play a game of Blackjack? Type 'y' or 'n': ")
-        comp_score = sum(comp_cards)
-        player_score = sum(player_cards)
+                logo = """
+                .------.            _     _            _    _            _    
+                |A_  _ |.          | |   | |          | |  (_)          | |   
+                |( \/ ).-----.     | |__ | | __ _  ___| | ___  __ _  ___| | __
+                | \\  /|K /\\  |     | '_ \\| |/ _\` |/ __| |/ / |/ _\` |/ __| |/ /
+                |  \\/ | /  \\ |     | |_) | | (_| | (__|   <| | (_| | (__|   < 
+                \`-----| \\  / |     |_.__/|_|\\__,_|\\___|_|\\_\\_|\\__,_|\\___|_|\\_\\\\
+                      |  \\/ K|                            _/ |                
+                      \`------'                           |__/           
+                """
+                
+                def print_output(text):
+                    display = document.getElementById("output")
+                    display.innerHTML += text + "<br>"
+                
+                print_output(logo)
 
-        def add_card():
-            card = random.choice(cards)
-            return card
+                cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
+                player_cards = random.sample(cards, 2)
+                comp_first_card = random.choice(cards)
+                comp_cards = random.sample(cards, 2)
+                play = input("Do you want to play a game of Blackjack? Type 'y' or 'n': ")
+                comp_score = sum(comp_cards)
+                player_score = sum(player_cards)
 
-        if play == "y":
-            while comp_score < 21 and player_score < 21:
-                print(f"     Your cards : {player_cards}, current score: {player_score}")
-                print(f"     Computer's first card: {comp_first_card}")
-                add = input("Type 'y' to get another card, type 'n' to pass: ")
+                def add_card():
+                    card = random.choice(cards)
+                    return card
 
-                if add == "y":
-                    new_card = add_card()
-                    player_cards.append(new_card)
-                    player_score = sum(player_cards)
-                    print("\n" * 20)
-                    print(logo)
+                if play == "y":
+                    while comp_score < 21 and player_score < 21:
+                        print_output(f"     Your cards : {player_cards}, current score: {player_score}")
+                        print_output(f"     Computer's first card: {comp_first_card}")
+                        add = input("Type 'y' to get another card, type 'n' to pass: ")
 
-                elif add == "n":
-                    new_card = add_card()
-                    comp_cards.append(new_card)
-                    comp_score = sum(comp_cards)
-                    print("\n" * 20)
-                    print(logo)
-                    print(f"Computer's cards: {comp_cards}, current score: {comp_score}")
-                    break
+                        if add == "y":
+                            new_card = add_card()
+                            player_cards.append(new_card)
+                            player_score = sum(player_cards)
+                            print_output("<br>" * 20)
+                            print_output(logo)
 
-            print(f"     Your final hand: {player_cards}, final score: {sum(player_cards)}")
-            print(f"Computer's final hand: {comp_cards}, final score: {sum(comp_cards)} ")
+                        elif add == "n":
+                            new_card = add_card()
+                            comp_cards.append(new_card)
+                            comp_score = sum(comp_cards)
+                            print_output("<br>" * 20)
+                            print_output(logo)
+                            print_output(f"Computer's cards: {comp_cards}, current score: {comp_score}")
+                            break
 
-            if player_score > 21:
-                print("You busted. You lose. :(")
-            elif comp_score > 21 or player_score > comp_score:
-                print("Dealer busted. You win! :D")
-            else:
-                print("You lose. :(")
-        else:
-            print("Ok!")
+                    print_output(f"     Your final hand: {player_cards}, final score: {sum(player_cards)}")
+                    print_output(f"Computer's final hand: {comp_cards}, final score: {sum(comp_cards)} ")
+
+                    if player_score > 21:
+                        print_output("You busted. You lose. :(")
+                    elif comp_score > 21 or player_score > comp_score:
+                        print_output("Dealer busted. You win! :D")
+                    else:
+                        print_output("You lose. :(")
+                else:
+                    print_output("Ok!")
+            `);
+        }
+        main();
     </script>
 </body>
 </html>
